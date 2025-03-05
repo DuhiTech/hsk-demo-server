@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateExamDto } from './dto';
+import { CreateExamDto, ExamDto, ExamWithSectionsDto } from './dto';
 
 @Injectable()
 export class ExamsService {
@@ -10,8 +10,8 @@ export class ExamsService {
     return this.prisma.exams.findMany();
   }
 
-  async getExamById(id: string): Promise<any> {
-    const exam = await this.prisma.exams.findUnique({ where: { id } });
+  async getExamById(id: string): Promise<ExamWithSectionsDto> {
+    const exam = await this.prisma.exams.findUnique({ where: { id }, include: { sections: true } });
     if (!exam) {
       throw new NotFoundException('Không tìm thấy đề thi');
     }
@@ -22,11 +22,19 @@ export class ExamsService {
     return this.prisma.exams.create({ data: { ...data, profile_id: 'a4d6a073-bec3-47a8-9314-506375aaff7c' } });
   }
 
-  updateExam(id: string, data: CreateExamDto): any {
-    return this.prisma.exams.update({ where: { id }, data });
+  async updateExam(id: string, data: CreateExamDto): Promise<ExamDto> {
+    const exam = this.prisma.exams.update({ where: { id }, data });
+    if (!exam) {
+      throw new NotFoundException('Không tìm thấy đề thi');
+    }
+    return exam;
   }
 
-  deleteExam(id: string): any {
-    return this.prisma.exams.delete({ where: { id } });
+  async deleteExam(id: string): Promise<ExamDto> {
+    const exam = await this.prisma.exams.delete({ where: { id } });
+    if (!exam) {
+      throw new NotFoundException('Không tìm thấy đề thi');
+    }
+    return exam;
   }
 }
