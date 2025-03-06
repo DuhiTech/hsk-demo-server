@@ -6,7 +6,7 @@ import { CreateExamDto, ExamDto, ExamWithSectionsDto } from './dto';
 export class ExamsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  getExams(): any {
+  getExams(): Promise<ExamDto[]> {
     return this.prisma.exams.findMany();
   }
 
@@ -18,12 +18,12 @@ export class ExamsService {
     return exam;
   }
 
-  createExam(data: CreateExamDto): any {
+  createExam(data: CreateExamDto): Promise<ExamDto> {
     return this.prisma.exams.create({ data: { ...data, profile_id: 'a4d6a073-bec3-47a8-9314-506375aaff7c' } });
   }
 
   async updateExam(id: string, data: CreateExamDto): Promise<ExamDto> {
-    const exam = this.prisma.exams.update({ where: { id }, data });
+    const exam = await this.prisma.exams.update({ where: { id }, data });
     if (!exam) {
       throw new NotFoundException('Không tìm thấy đề thi');
     }

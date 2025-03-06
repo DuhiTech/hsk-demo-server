@@ -4,8 +4,8 @@ import { CreateExamDto, ExamDto, ExamWithSectionsDto } from './dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ErrorDto } from 'src/dto';
 
-@Controller('exams')
 @ApiBearerAuth()
+@Controller('exams')
 export class ExamsController {
   constructor(private readonly examsService: ExamsService) {}
 
