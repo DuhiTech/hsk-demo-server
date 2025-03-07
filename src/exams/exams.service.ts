@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateExamDto, ExamDto, ExamWithSectionsDto } from './dto';
-import { CommonQueryDto, ListResultDto } from 'src/dto';
+import { FilterQueryDto, ListResultDto } from 'src/dto';
 
 @Injectable()
 export class ExamsService {
@@ -13,7 +13,7 @@ export class ExamsService {
     sortOrder,
     page = 1,
     take = 10,
-  }: CommonQueryDto<ExamDto>): Promise<ListResultDto<ExamDto>> {
+  }: FilterQueryDto<ExamDto>): Promise<ListResultDto<ExamDto>> {
     const [data, count] = await this.prisma.$transaction([
       this.prisma.exams.findMany({
         where: search ? { title: { contains: search, mode: 'insensitive' } } : undefined,
@@ -40,20 +40,23 @@ export class ExamsService {
     return exam;
   }
 
-  createExam(data: CreateExamDto): Promise<ExamDto> {
-    return this.prisma.exams.create({ data: { ...data, profile_id: 'a4d6a073-bec3-47a8-9314-506375aaff7c' } });
+  createExam(data: CreateExamDto, profile_id: string): Promise<ExamDto> {
+    return this.prisma.exams.create({ data: { ...data, profile_id } });
   }
 
-  async updateExam(id: string, data: CreateExamDto): Promise<ExamDto> {
-    const exam = await this.prisma.exams.update({ where: { id }, data });
+  async updateExam(id: string, data: CreateExamDto, profile_id: string): Promise<ExamDto> {
+    const exam = await this.prisma.exams.update({
+      where: { id, profile_id },
+      data: { ...data, modified_at: new Date() },
+    });
     if (!exam) {
       throw new NotFoundException('Không tìm thấy đề thi');
     }
     return exam;
   }
 
-  async deleteExam(id: string): Promise<ExamDto> {
-    const exam = await this.prisma.exams.delete({ where: { id } });
+  async deleteExam(id: string, profile_id?: string): Promise<ExamDto> {
+    const exam = await this.prisma.exams.delete({ where: { id, profile_id } });
     if (!exam) {
       throw new NotFoundException('Không tìm thấy đề thi');
     }
