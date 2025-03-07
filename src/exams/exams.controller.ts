@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
 import { ExamsService } from './exams.service';
 import { CreateExamDto, ExamDto, ExamWithSectionsDto } from './dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ErrorDto } from 'src/dto';
+import { CommonQueryDto, ErrorDto } from 'src/dto';
 import { RequiredRoles } from 'src/auth/decorator';
 import { ERole } from 'src/auth/dto';
 
@@ -15,8 +15,8 @@ export class ExamsController {
   @ApiResponse({ status: 200, type: ExamDto, isArray: true })
   @RequiredRoles(ERole.lecturer)
   @Get()
-  getExams() {
-    return this.examsService.getExams();
+  getExams(@Query() query: CommonQueryDto<ExamDto>) {
+    return this.examsService.getExams(query);
   }
 
   @ApiOperation({ summary: 'Lấy đề thi chi tiết' })

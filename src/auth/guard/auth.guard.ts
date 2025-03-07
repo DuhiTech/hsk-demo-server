@@ -19,10 +19,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       return true;
     }
 
-    const isAuthenticated = await super.canActivate(context);
-    if (!isAuthenticated) {
-      throw new UnauthorizedException('Chưa đăng nhập');
-    }
+    await super.canActivate(context);
 
     const request: Express.Request = context.switchToHttp().getRequest();
     const profile = request.user as ProfileDto;

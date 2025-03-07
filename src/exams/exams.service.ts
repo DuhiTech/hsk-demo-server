@@ -1,13 +1,35 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateExamDto, ExamDto, ExamWithSectionsDto } from './dto';
+import { CommonQueryDto, ListResultDto } from 'src/dto';
 
 @Injectable()
 export class ExamsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  getExams(): Promise<ExamDto[]> {
-    return this.prisma.exams.findMany();
+  async getExams({
+    search,
+    sortBy,
+    sortOrder,
+    page = 1,
+    take = 10,
+  }: CommonQueryDto<ExamDto>): Promise<ListResultDto<ExamDto>> {
+    const [data, count] = await this.prisma.$transaction([
+      this.prisma.exams.findMany({
+        where: search ? { title: { contains: search, mode: 'insensitive' } } : undefined,
+        orderBy: sortBy ? { [sortBy]: sortOrder } : undefined,
+        skip: (page - 1) * take,
+        take,
+      }),
+      this.prisma.exams.count({ where: search ? { title: { contains: search, mode: 'insensitive' } } : undefined }),
+    ]);
+
+    return {
+      data,
+      count,
+      totalPages: Math.ceil(count / take),
+      currentPage: page,
+    };
   }
 
   async getExamById(id: string): Promise<ExamWithSectionsDto> {

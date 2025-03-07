@@ -26,6 +26,9 @@ async function bootstrap() {
   });
 
   await app.listen(process.env.PORT ?? 9999);
+
+  // eslint-disable-next-line no-console
+  console.log(`Swagger is running on http://localhost:${process.env.PORT ?? 9999}/swagger/docs`);
 }
 
 void bootstrap();
