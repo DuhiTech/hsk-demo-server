@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query }
 import { ExamsService } from './exams.service';
 import { CreateExamDto, ExamDto, ExamWithSectionsDto } from './dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { FilterQueryDto, ErrorDto } from 'src/dto';
+import { FilterQueryDto, ErrorDto, ListResultDto } from 'src/dto';
 import { Profile, RequiredRoles } from 'src/auth/decorator';
 import { ERole, ProfileDto } from 'src/auth/dto';
 
@@ -12,7 +12,7 @@ export class ExamsController {
   constructor(private readonly examsService: ExamsService) {}
 
   @ApiOperation({ summary: 'Lấy tất cả đề thi' })
-  @ApiResponse({ status: 200, type: ExamDto, isArray: true })
+  @ApiResponse({ status: 200, type: ListResultDto<ExamDto> })
   @RequiredRoles(ERole.admin)
   @Get()
   getExams(@Query() query: FilterQueryDto<ExamDto>) {

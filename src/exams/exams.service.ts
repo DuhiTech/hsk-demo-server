@@ -33,7 +33,10 @@ export class ExamsService {
   }
 
   async getExamById(id: string): Promise<ExamWithSectionsDto> {
-    const exam = await this.prisma.exams.findUnique({ where: { id }, include: { sections: true } });
+    const exam = await this.prisma.exams.findUnique({
+      where: { id },
+      include: { sections: { orderBy: { order: 'asc' } } },
+    });
     if (!exam) {
       throw new NotFoundException('Không tìm thấy đề thi');
     }
